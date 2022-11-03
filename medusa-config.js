@@ -43,6 +43,24 @@ const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || "";
 const plugins = [
   `medusa-fulfillment-manual`,
   `medusa-payment-manual`,
+  {
+    resolve: `medusa-plugin-meilisearch`,
+    options: {
+      // config object passed when creating an instance of the MeiliSearch client
+      config: {
+        host: process.env.MEILISEARCH_HOST,
+        apiKey: process.env.MEILISEARCH_API_KEY,
+      },
+      settings: {
+        // index name
+        products: {
+          // MeiliSearch's setting options to be set on a particular index
+          searchableAttributes: ["title", "description", "variant_sku"],
+          displayedAttributes: ["title", "description", "variant_sku", "thumbnail", "handle"],
+        },
+      },
+    },
+  },
   // Uncomment to add Stripe support.
   // You can create a Stripe account via: https://stripe.com
   // {
@@ -56,7 +74,7 @@ const plugins = [
 
 module.exports = {
   projectConfig: {
-    // redis_url: REDIS_URL,
+    redis_url: REDIS_URL,
     // For more production-like environment install PostgresQL
     // database_url: DATABASE_URL,
     // database_type: "postgres",
