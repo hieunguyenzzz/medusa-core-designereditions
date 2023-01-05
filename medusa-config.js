@@ -44,7 +44,7 @@ const plugins = [
   `medusa-fulfillment-manual`,
   `medusa-payment-manual`,
   {
-    resolve: `medusa-plugin-meilisearch`,
+    resolve: `medusa-plugin-custom-meilisearch`,
     options: {
       // config object passed when creating an instance of the MeiliSearch client
       config: {
@@ -54,11 +54,31 @@ const plugins = [
       settings: {
         // index name
         products: {
+
           // MeiliSearch's setting options to be set on a particular index
-          searchableAttributes: ["title", "description", "variant_sku"],
-          displayedAttributes: ["title", "description", "variant_sku", "thumbnail", "handle"],
+          searchableAttributes: ["title", "description", "variant_sku", "variant_metadata_color","variant_metadata_material", "tags_value"],
+          displayedAttributes: ["title", "description", "variant_sku", "variant_metadata_color", "variant_title", "variant_metadata_material", "thumbnail", "handle", "tags_value", "variant_prices"],
+            filterableAttributes: ["variant_metadata_color", "variant_metadata_material", "tags_value"]
         },
+
       },
+    },
+  },
+  {
+    resolve: `medusa-file-spaces`,
+    options: {
+        spaces_url: process.env.SPACE_URL,
+        bucket: process.env.SPACE_BUCKET,
+        endpoint: process.env.SPACE_ENDPOINT,
+        access_key_id: process.env.SPACE_ACCESS_KEY_ID,
+        secret_access_key: process.env.SPACE_SECRET_ACCESS_KEY,
+    },
+  },
+  {
+    resolve: `medusa-payment-stripe`,
+    options: {
+      api_key: process.env.STRIPE_API_KEY,
+      webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
     },
   },
   // Uncomment to add Stripe support.
@@ -82,6 +102,7 @@ module.exports = {
     //database_type: "sqlite",
     store_cors: STORE_CORS,
     admin_cors: ADMIN_CORS,
+    jwt_secret: process.env.JWT_SECRET 
   },
   plugins,
 };
