@@ -2,16 +2,27 @@ import { Router } from "express"
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
+import { getConfigFile, parseCorsOrigins } from "medusa-core-utils"
+import { ConfigModule } from "@medusajs/medusa/dist/types/global"
+import cors from "cors"
+
 export default (rootDirectory, pluginOptions) => {
   const router = Router()
+  const { configModule } = getConfigFile(rootDirectory, "medusa-config")
+  const { projectConfig } = configModule
+  const corsOptions = {
+    origin: projectConfig.admin_cors.split(","),
+    credentials: true,
+  }
+  router.options("/admin/abandon_carts", cors(corsOptions))
+  router.get("/admin/abandon_carts", cors(corsOptions) , async (req, res) => {
 
-  router.get("/abandon_carts", async (req, res) => {
     let data = await getAllAbandonCart();
     console.log(data);
     res.json(data)
   })
-
-  router.get("/abandon_cart/:cartId", async (req, res) => {
+  router.options("/admin/abandon_cart/:cartId", cors(corsOptions))
+  router.get("/admin/abandon_cart/:cartId", cors(corsOptions) , async (req, res) => {
     const { cartId } = req.params;
     console.log(cartId);
     const data = await prisma.cart.findFirst({where: {id: cartId}})
